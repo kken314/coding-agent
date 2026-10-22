@@ -5,6 +5,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 from coding_agent.tools import TOOL_FUNCTIONS
+from coding_agent.schemas import TOOL_SCHEMAS
 
 load_dotenv()
 
@@ -27,83 +28,6 @@ SYSTEM_PROMPT = """You are a coding agent working inside the user's project fold
 - The user is on Windows, so use Windows commands (e.g. dir, not ls).
 - Keep answers short."""
 
-TOOL_SCHEMAS = [
-    {
-        "type": "function",
-        "function": {
-            "name": "list_files",
-            "description": "List the files and folders inside a directory.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "path": {
-                        "type": "string",
-                        "description": "Directory path to list. Defaults to the current directory."
-                    }
-                },
-                "required": []
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "read_file",
-            "description": "Read and return the text contents of a file.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "path": {
-                        "type": "string",
-                        "description": "Path of the file to read."
-                    }
-                },
-                "required": ["path"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "write_file",
-            "description": "Write text to a file. Creates the file if missing and overwrites it if it exists.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "path": {
-                        "type": "string",
-                        "description": "Path of the file to write."
-                    },
-                    "content": {
-                        "type": "string",
-                        "description": "The full text to put in the file."
-                    }
-                },
-                "required": ["path", "content"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "run_command",
-            "description": "Run a shell command and return its exit code, stdout and stderr. The user must approve it first.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "command": {
-                        "type": "string",
-                        "description": "The shell command to run."
-                    }
-                },
-                "required": ["command"]
-            }
-        }
-    }
-]
-
-# The Responses API expects function tool fields at the top level (no nested "function" key)
-TOOL_SCHEMAS = [{"type": "function", **schema["function"]} for schema in TOOL_SCHEMAS]
 
 # The server keeps the conversation; we only chain responses by id
 previous_response_id = None
